@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { addNewEvent } from '../../actions/eventActions'
-import PropTypes from 'prop-types'
 
 class NewEvent extends Component {
   state = {
@@ -13,7 +12,6 @@ class NewEvent extends Component {
   buttonClickHandler = () => {
     const { team_1, team_2, date } = this.state
     console.log(this)
-    debugger
     this.props.addNewEvent({
       team_1,
       team_2,

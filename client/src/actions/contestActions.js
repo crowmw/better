@@ -6,14 +6,26 @@ import { contestSchema } from '../services/normalizr'
 export const fetchContests = () => async dispatch => {
   dispatch({ type: types.FETCHING_CONTESTS })
 
-  const res = await axios.get('/api/contest')
+  try {
+    const res = await axios.get('/api/contest')
 
-  if (res.data && res.status === 200) {
+    if (res.data && res.status === 200) {
+      const normalized = normalize(res.data, [contestSchema])
+      return dispatch({
+        type: types.FETCH_CONTESTS_SUCCESS,
+        contests: normalized.entities.contest || {}
+      })
+    }
+  } catch ({
+    response: {
+      data: { error },
+      status
+    }
+  }) {
     return dispatch({
-      type: types.FETCH_CONTESTS_SUCCESS,
-      contests: normalize(res.data, [contestSchema]).entities.contest
+      type: types.FETCH_CONTESTS_ERROR,
+      error,
+      status
     })
   }
-
-  return dispatch({ type: types.FETCH_CONTESTS_ERROR, error: res.message })
 }
