@@ -1,0 +1,17 @@
+.button{
+  -webkit-appearance: none;
+  border-radius: 6px;
+  width: 100%;
+  background: none;
+  border: 1px solid lightgrey;
+  padding: 8px;
+  outline: none;
+}
+
+.button:active {
+opacity: 0.5;
+}
+
+.button--primary{
+  background: salmon;
+}
