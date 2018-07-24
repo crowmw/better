@@ -1,33 +1,26 @@
-const mongoose = require('mongoose')
-const Event = mongoose.model('Event')
-const Contest = mongoose.model('Contest')
+import { Router } from 'express'
+import eventController from '../controllers/eventController'
 
-const requireLogin = require('../middlewares/requireLogin')
+import requireLogin from '../middlewares/requireLogin'
+import { catchAsync } from '../middlewares/errors'
 
-module.exports = app => {
-  app.post('/api/event', requireLogin, async (req, res, next) => {
-    const { date, team_1, team_2, result, winner, contestId } = req.body
+export default () => {
+  const api = Router()
 
-    const event = new Event({
-      date,
-      team_1,
-      team_2,
-      result,
-      winner,
-      contestId
-    })
+  // GET /api/event/:slug
+  api.get('/:slug', requireLogin, catchAsync(eventController.findOne))
 
-    await event.save(async (err, res) => {
-      if (err) return next(err)
+  // GET /api/event
+  api.get('/', requireLogin, catchAsync(eventController.findAll))
 
-      const contest = await Contest.findOne({
-        createdBy: req.user._id,
-        _id: contestId
-      })
-      contest.events.push(res._id)
-      contest.save()
-    })
+  // POST /api/event
+  api.post('/', requireLogin, catchAsync(eventController.create))
 
-    res.send(event)
-  })
+  // PUT /api/event/:slug
+  api.put('/:slug', requireLogin, catchAsync(eventController.update))
+
+  // DELETE /api/event/:slug
+  api.delete('/:slug', requireLogin, catchAsync(eventController.delete))
+
+  return api
 }

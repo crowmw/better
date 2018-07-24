@@ -9,8 +9,9 @@ export const fetchContests = () => async dispatch => {
   try {
     const res = await axios.get('/api/contest')
 
-    if (res.data && res.status === 200) {
-      const normalized = normalize(res.data, [contestSchema])
+    if (res.data.data && res.status === 200) {
+      console.log(res)
+      const normalized = normalize(res.data.data, [contestSchema])
       return dispatch({
         type: types.FETCH_CONTESTS_SUCCESS,
         contests: normalized.entities.contest || {}

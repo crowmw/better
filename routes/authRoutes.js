@@ -1,27 +1,31 @@
-const passport = require('passport')
+import { Router } from 'express'
+import passport from 'passport'
+import authController from '../controllers/authController'
+import { catchAsync } from '../middlewares/errors'
 
-module.exports = app => {
-  app.get(
-    '/auth/google',
+export default () => {
+  const api = Router()
+
+  // GET /auth/google
+  api.get(
+    '/google',
     passport.authenticate('google', {
       scope: ['profile', 'email']
     })
   )
 
-  app.get(
-    '/auth/google/callback',
+  // GET /auth/google/callback
+  api.get(
+    '/google/callback',
     passport.authenticate('google'),
-    (req, res) => {
-      res.redirect('/')
-    }
+    catchAsync(authController.googleCallback)
   )
 
-  app.get('/api/logout', (req, res) => {
-    req.logout()
-    res.redirect('/')
-  })
+  // GET /auth/logout
+  api.get('/logout', catchAsync(authController.logout))
 
-  app.get('/api/current_user', (req, res) => {
-    res.send(req.user)
-  })
+  // GET /auth/current_user
+  api.get('/current_user', catchAsync(authController.currentUser))
+
+  return api
 }

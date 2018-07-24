@@ -1,7 +1,7 @@
-module.exports = (req, res, next) => {
+export default (req, res, next) => {
   if (!req.user) {
-    return res.status(401).send({ error: 'You must sign in!' })
+    return res.status(401).send({ error: 'You must sign in.' })
   }
 
-  next()
+  return next()
 }

@@ -1,39 +1,25 @@
-const mongoose = require('mongoose')
-const Contest = mongoose.model('Contest')
+import { Router } from 'express'
+import { catchAsync } from '../middlewares/errors'
+import contestController from '../controllers/contestController'
+import requireLogin from '../middlewares/requireLogin'
 
-const requireLogin = require('../middlewares/requireLogin')
+export default () => {
+  const api = Router()
 
-module.exports = app => {
-  app.get('/api/contest', requireLogin, async (req, res) => {
-    const contest = await Contest.find({ createdBy: req.user._id })
+  // GET /contest/:slug
+  api.get('/:slug', requireLogin, catchAsync(contestController.findOne))
 
-    res.send(contest)
-  })
+  // GET /contest
+  api.get('/', requireLogin, catchAsync(contestController.findAll))
 
-  app.post('/api/contest', requireLogin, async (req, res) => {
-    const { name, description, startDate, players, events } = req.body
+  // POST /contest
+  api.post('/', requireLogin, catchAsync(contestController.create))
 
-    const contest = new Contest({
-      name,
-      description,
-      startDate,
-      players,
-      events,
-      createdBy: req.user._id
-    })
+  // PUT /contest/:slug
+  api.put('/', requireLogin, catchAsync(contestController.update))
 
-    await contest.save()
-    res.send(contest)
-  })
+  // DELETE /contest/:slug
+  api.delete('/:id', requireLogin, catchAsync(contestController.delete))
 
-  app.get('/api/contest/:id/events', requireLogin, async (req, res) => {
-    const contests = await Contest.find({
-      createdBy: req.user._id,
-      _id: req.params.id
-    }).populate('events')
-    console.log(contests)
-    if (contests) {
-      res.send(contests.events)
-    }
-  })
+  return api
 }

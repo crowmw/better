@@ -1,15 +1,18 @@
-const express = require('express')
-const mongoose = require('mongoose')
-const cookieSession = require('cookie-session')
-const passport = require('passport')
-const bodyParser = require('body-parser')
-const keys = require('./config/keys')
+import express from 'express'
+import mongoose from 'mongoose'
+import cookieSession from 'cookie-session'
+import passport from 'passport'
+import bodyParser from 'body-parser'
 
-require('./models/User')
-require('./models/Event')
-require('./models/Contest')
+import keys from './config/keys'
 
-require('./services/passport')
+import contest from './routes/contestRoutes'
+import authorization from './routes/authRoutes'
+import event from './routes/eventRoutes'
+
+import { notFound, catchErrors } from './middlewares/errors'
+
+import './services/passport'
 
 mongoose.connect(keys.mongoURI)
 
@@ -26,9 +29,14 @@ app.use(
 app.use(passport.initialize())
 app.use(passport.session())
 
-require('./routes/authRoutes')(app)
-require('./routes/contestRoutes')(app)
-require('./routes/eventRoutes')(app)
+// routes config
+app.use('/auth', authorization())
+app.use('/api/contest', contest())
+app.use('/api/event', event())
+
+// errors handling
+app.use(notFound)
+app.use(catchErrors)
 
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static('client/build'))

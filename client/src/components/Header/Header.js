@@ -21,7 +21,7 @@ class HeaderNav extends Component {
       default:
         return (
           <li key="1">
-            <a href="/api/logout" className="nav-link">
+            <a href="/auth/logout" className="nav-link">
               Logout
             </a>
           </li>
